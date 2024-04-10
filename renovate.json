@@ -1,0 +1,38 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "customDatasources": {
+    "databricksSparkVersions": {
+      "defaultRegistryUrlTemplate": "http://localhost:5000",
+      "format": "json",
+      "transformTemplates": ["{\"releases\": $filter(versions, function($v) { $contains($v.key, \"x-scala\") }).{\"version\": key}}"]
+    }
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "datasourceTemplate": "custom.databricksSparkVersions",
+      "fileMatch": ["test"],
+      "matchStrings": [
+        "#\\s*renovate:\\s*DBR_VERSION:\\s*\"(?<major>\\d+)\\.(?<minor>\\d+)\\.x-(?<suffix>[\\w\\d\\.]+)\""
+      ],
+      "currentValueTemplate": "{{major}}.{{minor}}.x-{{suffix}}",
+      "depNameTemplate": "test",
+      "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.x-(?<compatibility>.*)$"
+    }
+  ],
+  "enabledManagers": [
+    "custom.regex"
+  ],
+  "hostRules": [{
+    "matchHost": "http://localhost:5000",
+    "authType": "Bearer",
+    "token": "dapifaketoken"
+  }],
+  "labels": [
+    "dependencies"
+  ],
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 5,
+  "separateMajorMinor": true,
+  "separateMultipleMajor": true
+}
